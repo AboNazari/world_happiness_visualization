@@ -49,6 +49,7 @@ If you use Visual Studio Code, install the **Live Server** extension, right-clic
 ├── styles.css      Stylesheet (seasons, layout, responsive)
 ├── main.js         D3.js visualisation logic
 ├── data.csv        World Happiness Report dataset
+├── favicon.ico     Website favicon
 └── README.md       This file
 ```
 

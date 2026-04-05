@@ -7,7 +7,7 @@
 const FACTORS = [
     { key: "Log GDP per capita", label: "GDP", color: "#E8B931", shortLabel: "GDP" },
     { key: "Social support", label: "Social Support", color: "#E85D75", shortLabel: "Social" },
-    { key: "Healthy life expectancy at birth", label: "Health", color: "#5DBE6E", shortLabel: "Health" },
+    { key: "Healthy life expectancy at birth", label: "Healthy life expectancy", color: "#5DBE6E", shortLabel: "Healthy life" },
     { key: "Freedom to make life choices", label: "Freedom", color: "#5BA4CF", shortLabel: "Freedom" },
     { key: "Generosity", label: "Generosity", color: "#C77DFF", shortLabel: "Generosity" },
     { key: "Perceptions of corruption", label: "Trust", color: "#FF8C42", shortLabel: "Trust" }
@@ -119,14 +119,14 @@ let leaves = [];
 // Deterministic seeded random for stable layouts
 function seededRandom(seed) {
     let s = seed;
-    return function() {
+    return function () {
         s = (s * 16807 + 0) % 2147483647;
         return (s - 1) / 2147483646;
     };
 }
 
 // ---- Load Data & Init ----
-d3.csv("data.csv").then(function(raw) {
+d3.csv("data.csv").then(function (raw) {
     allData = raw.map(d => ({
         country: d["Country name"],
         year: +d["year"],
@@ -202,14 +202,14 @@ function getFilterScore(d) {
 // Quadratic Bezier helpers
 function bzPt(p0x, p0y, cpx, cpy, p1x, p1y, t) {
     const o = 1 - t;
-    return { x: o*o*p0x + 2*o*t*cpx + t*t*p1x, y: o*o*p0y + 2*o*t*cpy + t*t*p1y };
+    return { x: o * o * p0x + 2 * o * t * cpx + t * t * p1x, y: o * o * p0y + 2 * o * t * cpy + t * t * p1y };
 }
 function bzNorm(p0x, p0y, cpx, cpy, p1x, p1y, t) {
     const o = 1 - t;
-    const tx = 2*o*(cpx-p0x) + 2*t*(p1x-cpx);
-    const ty = 2*o*(cpy-p0y) + 2*t*(p1y-cpy);
+    const tx = 2 * o * (cpx - p0x) + 2 * t * (p1x - cpx);
+    const ty = 2 * o * (cpy - p0y) + 2 * t * (p1y - cpy);
     const len = Math.hypot(tx, ty) || 1;
-    return { x: -ty/len, y: tx/len };
+    return { x: -ty / len, y: tx / len };
 }
 
 // ========================================================
@@ -238,16 +238,16 @@ function drawTree() {
     const defs = svg.append("defs");
 
     // Trunk gradient
-    const tg = defs.append("linearGradient").attr("id", "trunkGrad").attr("x1","0%").attr("x2","100%");
-    tg.append("stop").attr("offset","0%").attr("stop-color","#4E342E");
-    tg.append("stop").attr("offset","35%").attr("stop-color","#6D4C41");
-    tg.append("stop").attr("offset","65%").attr("stop-color","#5D4037");
-    tg.append("stop").attr("offset","100%").attr("stop-color","#3E2723");
+    const tg = defs.append("linearGradient").attr("id", "trunkGrad").attr("x1", "0%").attr("x2", "100%");
+    tg.append("stop").attr("offset", "0%").attr("stop-color", "#4E342E");
+    tg.append("stop").attr("offset", "35%").attr("stop-color", "#6D4C41");
+    tg.append("stop").attr("offset", "65%").attr("stop-color", "#5D4037");
+    tg.append("stop").attr("offset", "100%").attr("stop-color", "#3E2723");
 
     // Ground gradient
-    const gg = defs.append("linearGradient").attr("id","groundGrad").attr("x1","0%").attr("y1","0%").attr("x2","0%").attr("y2","100%");
-    gg.append("stop").attr("offset","0%").attr("stop-color","var(--ground-gradient-start)");
-    gg.append("stop").attr("offset","100%").attr("stop-color","var(--ground-gradient-end)");
+    const gg = defs.append("linearGradient").attr("id", "groundGrad").attr("x1", "0%").attr("y1", "0%").attr("x2", "0%").attr("y2", "100%");
+    gg.append("stop").attr("offset", "0%").attr("stop-color", "var(--ground-gradient-start)");
+    gg.append("stop").attr("offset", "100%").attr("stop-color", "var(--ground-gradient-end)");
 
     const cx = W / 2;
     const groundY = H - 55;
@@ -264,25 +264,25 @@ function drawTree() {
     svg.append("path")
         .attr("d", `
             M ${cx - trunkW} ${groundY}
-            C ${cx - trunkW*0.85} ${groundY - (groundY-trunkTopY)*0.35},
-              ${cx - trunkW*0.45} ${groundY - (groundY-trunkTopY)*0.75},
-              ${cx - trunkW*0.2} ${trunkTopY}
-            L ${cx + trunkW*0.2} ${trunkTopY}
-            C ${cx + trunkW*0.45} ${groundY - (groundY-trunkTopY)*0.75},
-              ${cx + trunkW*0.85} ${groundY - (groundY-trunkTopY)*0.35},
+            C ${cx - trunkW * 0.85} ${groundY - (groundY - trunkTopY) * 0.35},
+              ${cx - trunkW * 0.45} ${groundY - (groundY - trunkTopY) * 0.75},
+              ${cx - trunkW * 0.2} ${trunkTopY}
+            L ${cx + trunkW * 0.2} ${trunkTopY}
+            C ${cx + trunkW * 0.45} ${groundY - (groundY - trunkTopY) * 0.75},
+              ${cx + trunkW * 0.85} ${groundY - (groundY - trunkTopY) * 0.35},
               ${cx + trunkW} ${groundY}
             Z`)
-        .attr("fill", "url(#trunkGrad)").attr("stroke","#3E2723").attr("stroke-width",0.8);
+        .attr("fill", "url(#trunkGrad)").attr("stroke", "#3E2723").attr("stroke-width", 0.8);
 
     // Bark
     const rng = seededRandom(42);
     for (let i = 0; i < 14; i++) {
-        const t = 0.08 + rng()*0.8;
-        const by = groundY - t*(groundY-trunkTopY);
-        const bx = cx + (rng()-0.5)*trunkW*0.5;
-        svg.append("line").attr("x1",bx).attr("y1",by)
-            .attr("x2",bx+(rng()-0.5)*3).attr("y2",by - 8 - rng()*20)
-            .attr("stroke","#3E2723").attr("stroke-width",0.5).attr("opacity",0.2);
+        const t = 0.08 + rng() * 0.8;
+        const by = groundY - t * (groundY - trunkTopY);
+        const bx = cx + (rng() - 0.5) * trunkW * 0.5;
+        svg.append("line").attr("x1", bx).attr("y1", by)
+            .attr("x2", bx + (rng() - 0.5) * 3).attr("y2", by - 8 - rng() * 20)
+            .attr("stroke", "#3E2723").attr("stroke-width", 0.5).attr("opacity", 0.2);
     }
 
     // --- Canopy ---
@@ -313,11 +313,11 @@ function drawTree() {
             const n = countries.length;
 
             // Angle from vertical
-            const angleDeg = minAngleDeg + (idx / Math.max(count-1, 1)) * (maxAngleDeg - minAngleDeg);
+            const angleDeg = minAngleDeg + (idx / Math.max(count - 1, 1)) * (maxAngleDeg - minAngleDeg);
             const aRad = sign * angleDeg * Math.PI / 180;
 
             // Origin on trunk, staggered vertically
-            const trunkT = 0.03 + (idx / Math.max(count-1, 1)) * 0.42;
+            const trunkT = 0.03 + (idx / Math.max(count - 1, 1)) * 0.42;
             const sy = trunkTopY + trunkT * (groundY - trunkTopY);
             const sx = cx + sign * trunkW * 0.35;
 
@@ -334,47 +334,47 @@ function drawTree() {
 
             // Control point (gentle curve)
             const bend = 0.12 + rng() * 0.08;
-            const cpx = sx + Math.sin(aRad)*branchLen*0.5 + Math.cos(aRad)*branchLen*bend*sign;
-            const cpy = sy - Math.cos(aRad)*branchLen*0.5 + Math.sin(aRad)*branchLen*bend*0.2;
+            const cpx = sx + Math.sin(aRad) * branchLen * 0.5 + Math.cos(aRad) * branchLen * bend * sign;
+            const cpy = sy - Math.cos(aRad) * branchLen * 0.5 + Math.sin(aRad) * branchLen * bend * 0.2;
 
             const thick = Math.max(2, 2.5 + n * 0.12);
 
-            const branchG = canopy.append("g").attr("class","branch-group").attr("data-region",region);
+            const branchG = canopy.append("g").attr("class", "branch-group").attr("data-region", region);
 
             // Shadow
             branchG.append("path")
                 .attr("d", `M ${sx} ${sy} Q ${cpx} ${cpy}, ${ex} ${ey}`)
-                .attr("stroke","#3E2723").attr("stroke-width",thick+2)
-                .attr("fill","none").attr("stroke-linecap","round").attr("opacity",0.1);
+                .attr("stroke", "#3E2723").attr("stroke-width", thick + 2)
+                .attr("fill", "none").attr("stroke-linecap", "round").attr("opacity", 0.1);
             // Main branch
             branchG.append("path")
-                .attr("class","branch-path")
+                .attr("class", "branch-path")
                 .attr("d", `M ${sx} ${sy} Q ${cpx} ${cpy}, ${ex} ${ey}`)
-                .attr("stroke","#5D4037").attr("stroke-width",thick)
-                .attr("fill","none").attr("stroke-linecap","round").attr("opacity",0.88);
+                .attr("stroke", "#5D4037").attr("stroke-width", thick)
+                .attr("fill", "none").attr("stroke-linecap", "round").attr("opacity", 0.88);
 
             // Sub-branches for large regions (>10 countries)
             const subBranches = [];
             if (n > 10) {
                 const numSubs = n > 22 ? 3 : 2;
                 for (let si = 0; si < numSubs; si++) {
-                    const ft = 0.35 + (si/(numSubs-0.5))*0.4;
-                    const fp = bzPt(sx,sy,cpx,cpy,ex,ey,ft);
-                    const fn = bzNorm(sx,sy,cpx,cpy,ex,ey,ft);
-                    const dir = (si%2===0?1:-1);
-                    const sLen = branchLen*(0.3+rng()*0.15);
+                    const ft = 0.35 + (si / (numSubs - 0.5)) * 0.4;
+                    const fp = bzPt(sx, sy, cpx, cpy, ex, ey, ft);
+                    const fn = bzNorm(sx, sy, cpx, cpy, ex, ey, ft);
+                    const dir = (si % 2 === 0 ? 1 : -1);
+                    const sLen = branchLen * (0.3 + rng() * 0.15);
                     // Sub-branch goes outward + along
-                    const tangX = (ex-sx)/branchLen, tangY = (ey-sy)/branchLen;
-                    const subEx = fp.x + fn.x*dir*sLen*0.6 + tangX*sLen*0.55;
-                    const subEy = fp.y + fn.y*dir*sLen*0.6 + tangY*sLen*0.55 - sLen*0.1;
-                    const subCpx = (fp.x+subEx)/2 + fn.x*dir*sLen*0.15;
-                    const subCpy = (fp.y+subEy)/2 + fn.y*dir*sLen*0.15;
-                    subBranches.push({sx:fp.x,sy:fp.y,cpx:subCpx,cpy:subCpy,ex:subEx,ey:subEy});
+                    const tangX = (ex - sx) / branchLen, tangY = (ey - sy) / branchLen;
+                    const subEx = fp.x + fn.x * dir * sLen * 0.6 + tangX * sLen * 0.55;
+                    const subEy = fp.y + fn.y * dir * sLen * 0.6 + tangY * sLen * 0.55 - sLen * 0.1;
+                    const subCpx = (fp.x + subEx) / 2 + fn.x * dir * sLen * 0.15;
+                    const subCpy = (fp.y + subEy) / 2 + fn.y * dir * sLen * 0.15;
+                    subBranches.push({ sx: fp.x, sy: fp.y, cpx: subCpx, cpy: subCpy, ex: subEx, ey: subEy });
 
                     branchG.append("path")
-                        .attr("d",`M ${fp.x} ${fp.y} Q ${subCpx} ${subCpy}, ${subEx} ${subEy}`)
-                        .attr("stroke","#6D4C41").attr("stroke-width",Math.max(1.2,thick*0.45))
-                        .attr("fill","none").attr("stroke-linecap","round").attr("opacity",0.65);
+                        .attr("d", `M ${fp.x} ${fp.y} Q ${subCpx} ${subCpy}, ${subEx} ${subEy}`)
+                        .attr("stroke", "#6D4C41").attr("stroke-width", Math.max(1.2, thick * 0.45))
+                        .attr("fill", "none").attr("stroke-linecap", "round").attr("opacity", 0.65);
                 }
             }
 
@@ -382,12 +382,12 @@ function drawTree() {
             const mainSlots = subBranches.length > 0 ? Math.ceil(n * 0.4) : n;
             const branchFlowers = [];
 
-            function placeOnCurve(c, ci, total, p0x,p0y,cx2,cy2,p1x,p1y) {
+            function placeOnCurve(c, ci, total, p0x, p0y, cx2, cy2, p1x, p1y) {
                 const happiness = c.happiness || 0;
                 const active = getActiveFactors();
                 let fR;
                 if (active.length === FACTORS.length || active.length === 0) {
-                    fR = 10 + (happiness/10)*18;
+                    fR = 10 + (happiness / 10) * 18;
                 } else {
                     const vals = active.map(f => {
                         const v = getFactorValue(c, f.key);
@@ -395,18 +395,18 @@ function drawTree() {
                         return getNormalizedValue(v, f.key, data);
                     }).filter(v => v != null);
                     if (vals.length === 0) return;
-                    fR = 10 + d3.mean(vals)*18;
+                    fR = 10 + d3.mean(vals) * 18;
                 }
-                const t2 = 0.08 + (ci / Math.max(total-1, 1)) * 0.88;
-                const pt = bzPt(p0x,p0y,cx2,cy2,p1x,p1y,t2);
-                const nm = bzNorm(p0x,p0y,cx2,cy2,p1x,p1y,t2);
+                const t2 = 0.08 + (ci / Math.max(total - 1, 1)) * 0.88;
+                const pt = bzPt(p0x, p0y, cx2, cy2, p1x, p1y, t2);
+                const nm = bzNorm(p0x, p0y, cx2, cy2, p1x, p1y, t2);
                 // Spread into 3 lanes with moderate spacing so flowers stay near branch
                 const laneIdx = (ci % 3) - 1; // -1, 0, 1
                 const laneSpacing = fR * 1.6 + 6;
                 const fx = pt.x + nm.x * laneIdx * laneSpacing;
                 const fy = pt.y + nm.y * laneIdx * laneSpacing;
                 branchFlowers.push({
-                    c, r:fR,
+                    c, r: fR,
                     x: fx, y: fy,
                     origX: fx, origY: fy,
                     anchorX: pt.x, anchorY: pt.y  // point on branch for stem
@@ -415,16 +415,16 @@ function drawTree() {
 
             // Main branch flowers
             for (let ci = 0; ci < Math.min(mainSlots, n); ci++) {
-                placeOnCurve(countries[ci], ci, mainSlots, sx,sy,cpx,cpy,ex,ey);
+                placeOnCurve(countries[ci], ci, mainSlots, sx, sy, cpx, cpy, ex, ey);
             }
             // Sub-branch flowers
             if (subBranches.length > 0) {
                 const rest = countries.slice(mainSlots);
                 const perSub = Math.ceil(rest.length / subBranches.length);
                 subBranches.forEach((sb, si) => {
-                    const chunk = rest.slice(si*perSub, (si+1)*perSub);
+                    const chunk = rest.slice(si * perSub, (si + 1) * perSub);
                     chunk.forEach((c, ci) => {
-                        placeOnCurve(c, ci, chunk.length, sb.sx,sb.sy,sb.cpx,sb.cpy,sb.ex,sb.ey);
+                        placeOnCurve(c, ci, chunk.length, sb.sx, sb.sy, sb.cpx, sb.cpy, sb.ex, sb.ey);
                     });
                 });
             }
@@ -433,17 +433,17 @@ function drawTree() {
             for (let iter = 0; iter < 50; iter++) {
                 let moved = false;
                 for (let i = 0; i < branchFlowers.length; i++) {
-                    for (let j = i+1; j < branchFlowers.length; j++) {
+                    for (let j = i + 1; j < branchFlowers.length; j++) {
                         const a = branchFlowers[i], b = branchFlowers[j];
-                        const dx = b.x-a.x, dy = b.y-a.y;
-                        const d2 = dx*dx+dy*dy;
-                        const minD = a.r+b.r+4;
-                        if (d2 < minD*minD && d2 > 0.01) {
+                        const dx = b.x - a.x, dy = b.y - a.y;
+                        const d2 = dx * dx + dy * dy;
+                        const minD = a.r + b.r + 4;
+                        if (d2 < minD * minD && d2 > 0.01) {
                             const dist = Math.sqrt(d2);
-                            const ov = (minD-dist)*0.5;
-                            const ux=dx/dist, uy=dy/dist;
-                            a.x -= ux*ov; a.y -= uy*ov;
-                            b.x += ux*ov; b.y += uy*ov;
+                            const ov = (minD - dist) * 0.5;
+                            const ux = dx / dist, uy = dy / dist;
+                            a.x -= ux * ov; a.y -= uy * ov;
+                            b.x += ux * ov; b.y += uy * ov;
                             moved = true;
                         }
                     }
@@ -451,43 +451,43 @@ function drawTree() {
                 if (!moved) break;
                 // Moderate pull back to keep flowers attached near branch
                 branchFlowers.forEach(f => {
-                    f.x += (f.origX-f.x)*0.1;
-                    f.y += (f.origY-f.y)*0.1;
+                    f.x += (f.origX - f.x) * 0.1;
+                    f.y += (f.origY - f.y) * 0.1;
                 });
             }
             // Clamp
             branchFlowers.forEach(f => {
-                f.x = Math.max(f.r+3, Math.min(W-f.r-3, f.x));
-                f.y = Math.max(f.r+3, Math.min(groundY-f.r-12, f.y));
+                f.x = Math.max(f.r + 3, Math.min(W - f.r - 3, f.x));
+                f.y = Math.max(f.r + 3, Math.min(groundY - f.r - 12, f.y));
                 allFlowers.push(f);
             });
 
             // Region label at tip
-            branchG.append("text").attr("class","branch-label")
-                .attr("x", ex + sign*8).attr("y", ey - 6)
-                .attr("text-anchor", side==="left"?"end":"start")
-                .attr("font-size", Math.min(11, 8+n*0.12)+"px")
-                .attr("fill", regionColor).attr("font-weight","600").attr("opacity",0.9)
+            branchG.append("text").attr("class", "branch-label")
+                .attr("x", ex + sign * 8).attr("y", ey - 6)
+                .attr("text-anchor", side === "left" ? "end" : "start")
+                .attr("font-size", Math.min(11, 8 + n * 0.12) + "px")
+                .attr("fill", regionColor).attr("font-weight", "600").attr("opacity", 0.9)
                 .text(region);
 
             // Foliage leaves
             const leafN = Math.min(n, 8);
             for (let li = 0; li < leafN; li++) {
-                const lt = 0.05 + rng()*0.65;
-                const lp = bzPt(sx,sy,cpx,cpy,ex,ey,lt);
-                const ln2 = bzNorm(sx,sy,cpx,cpy,ex,ey,lt);
-                const lx = lp.x + ln2.x*((rng()-0.5)*22) + (rng()-0.5)*8;
-                const ly = lp.y + ln2.y*((rng()-0.5)*22) + (rng()-0.5)*8;
-                const ls = 5+rng()*7, lr = (rng()-0.5)*80;
-                const lc = ["var(--leaf-color-1)","var(--leaf-color-2)","var(--leaf-color-3)"];
+                const lt = 0.05 + rng() * 0.65;
+                const lp = bzPt(sx, sy, cpx, cpy, ex, ey, lt);
+                const ln2 = bzNorm(sx, sy, cpx, cpy, ex, ey, lt);
+                const lx = lp.x + ln2.x * ((rng() - 0.5) * 22) + (rng() - 0.5) * 8;
+                const ly = lp.y + ln2.y * ((rng() - 0.5) * 22) + (rng() - 0.5) * 8;
+                const ls = 5 + rng() * 7, lr = (rng() - 0.5) * 80;
+                const lc = ["var(--leaf-color-1)", "var(--leaf-color-2)", "var(--leaf-color-3)"];
                 canopy.append("ellipse")
-                    .attr("cx",lx).attr("cy",ly).attr("rx",ls).attr("ry",ls*0.38)
-                    .attr("fill",lc[li%3]).attr("opacity",0.35+rng()*0.3)
-                    .attr("transform",`rotate(${lr},${lx},${ly})`);
+                    .attr("cx", lx).attr("cy", ly).attr("rx", ls).attr("ry", ls * 0.38)
+                    .attr("fill", lc[li % 3]).attr("opacity", 0.35 + rng() * 0.3)
+                    .attr("transform", `rotate(${lr},${lx},${ly})`);
             }
 
             // Branch click
-            branchG.on("click", function(event) {
+            branchG.on("click", function (event) {
                 event.stopPropagation();
                 showRegionDetail(region, countries);
             });
@@ -501,17 +501,17 @@ function drawTree() {
     for (let iter = 0; iter < 30; iter++) {
         let moved = false;
         for (let i = 0; i < allFlowers.length; i++) {
-            for (let j = i+1; j < allFlowers.length; j++) {
+            for (let j = i + 1; j < allFlowers.length; j++) {
                 const a = allFlowers[i], b = allFlowers[j];
-                const dx = b.x-a.x, dy = b.y-a.y;
-                const d2 = dx*dx+dy*dy;
-                const minD = a.r+b.r+4;
-                if (d2 < minD*minD && d2 > 0.01) {
+                const dx = b.x - a.x, dy = b.y - a.y;
+                const d2 = dx * dx + dy * dy;
+                const minD = a.r + b.r + 4;
+                if (d2 < minD * minD && d2 > 0.01) {
                     const dist = Math.sqrt(d2);
-                    const ov = (minD-dist)*0.45;
-                    const ux=dx/dist, uy=dy/dist;
-                    a.x -= ux*ov; a.y -= uy*ov;
-                    b.x += ux*ov; b.y += uy*ov;
+                    const ov = (minD - dist) * 0.45;
+                    const ux = dx / dist, uy = dy / dist;
+                    a.x -= ux * ov; a.y -= uy * ov;
+                    b.x += ux * ov; b.y += uy * ov;
                     moved = true;
                 }
             }
@@ -520,8 +520,8 @@ function drawTree() {
     }
     // Final clamp
     allFlowers.forEach(f => {
-        f.x = Math.max(f.r+3, Math.min(W-f.r-3, f.x));
-        f.y = Math.max(f.r+3, Math.min(groundY-f.r-12, f.y));
+        f.x = Math.max(f.r + 3, Math.min(W - f.r - 3, f.x));
+        f.y = Math.max(f.r + 3, Math.min(groundY - f.r - 12, f.y));
     });
 
     // --- Draw stems from branch to each flower ---
@@ -562,7 +562,7 @@ function drawFlower(parent, c, x, y, allYearData) {
 
     if (active.length === FACTORS.length || active.length === 0) {
         // All selected or none: size by happiness
-        flowerRadius = 10 + (happiness/10)*18;
+        flowerRadius = 10 + (happiness / 10) * 18;
     } else {
         const vals = active.map(f => {
             const v = getFactorValue(c, f.key);
@@ -570,12 +570,12 @@ function drawFlower(parent, c, x, y, allYearData) {
             return getNormalizedValue(v, f.key, allYearData);
         }).filter(v => v != null);
         if (vals.length === 0) return;
-        flowerRadius = 10 + d3.mean(vals)*18;
+        flowerRadius = 10 + d3.mean(vals) * 18;
     }
 
     const g = parent.append("g")
-        .attr("class","flower-group")
-        .attr("transform",`translate(${x},${y})`);
+        .attr("class", "flower-group")
+        .attr("transform", `translate(${x},${y})`);
 
     // Determine which petals to show
     const petalsToShow = active.length > 0 ? active : FACTORS;
@@ -585,45 +585,45 @@ function drawFlower(parent, c, x, y, allYearData) {
         const val = getFactorValue(c, f.key);
         if (val == null) return;
         const norm = getNormalizedValue(val, f.key, allYearData);
-        const pLen = flowerRadius * (0.6 + norm*0.6);
-        const angle = (i/numPetals)*Math.PI*2 - Math.PI/2;
-        const px = Math.cos(angle)*pLen, py = Math.sin(angle)*pLen;
-        const pW = flowerRadius*0.35;
-        const c1x = Math.cos(angle-0.35)*pLen*0.55, c1y = Math.sin(angle-0.35)*pLen*0.55;
-        const c2x = Math.cos(angle+0.35)*pLen*0.55, c2y = Math.sin(angle+0.35)*pLen*0.55;
+        const pLen = flowerRadius * (0.6 + norm * 0.6);
+        const angle = (i / numPetals) * Math.PI * 2 - Math.PI / 2;
+        const px = Math.cos(angle) * pLen, py = Math.sin(angle) * pLen;
+        const pW = flowerRadius * 0.35;
+        const c1x = Math.cos(angle - 0.35) * pLen * 0.55, c1y = Math.sin(angle - 0.35) * pLen * 0.55;
+        const c2x = Math.cos(angle + 0.35) * pLen * 0.55, c2y = Math.sin(angle + 0.35) * pLen * 0.55;
 
         g.append("path")
-            .attr("d",`M 0 0 C ${c1x} ${c1y}, ${px-Math.sin(angle)*pW} ${py+Math.cos(angle)*pW}, ${px} ${py} C ${px+Math.sin(angle)*pW} ${py-Math.cos(angle)*pW}, ${c2x} ${c2y}, 0 0`)
-            .attr("fill",f.color).attr("opacity",0.5+norm*0.45)
-            .attr("stroke",d3.color(f.color).darker(0.5)).attr("stroke-width",0.5);
+            .attr("d", `M 0 0 C ${c1x} ${c1y}, ${px - Math.sin(angle) * pW} ${py + Math.cos(angle) * pW}, ${px} ${py} C ${px + Math.sin(angle) * pW} ${py - Math.cos(angle) * pW}, ${c2x} ${c2y}, 0 0`)
+            .attr("fill", f.color).attr("opacity", 0.5 + norm * 0.45)
+            .attr("stroke", d3.color(f.color).darker(0.5)).attr("stroke-width", 0.5);
     });
 
     // Center circle
-    g.append("circle").attr("r",flowerRadius*0.25)
-        .attr("fill","#FFD54F").attr("stroke","#F9A825").attr("stroke-width",0.8);
+    g.append("circle").attr("r", flowerRadius * 0.25)
+        .attr("fill", "#FFD54F").attr("stroke", "#F9A825").attr("stroke-width", 0.8);
 
     // Label
-    g.append("text").attr("y",flowerRadius+11).attr("text-anchor","middle")
-        .attr("font-size","7.5px").attr("font-family","var(--font-ui)")
-        .attr("fill","var(--text-color)").attr("opacity",0.65)
-        .text(c.country.length>14?c.country.slice(0,13)+"…":c.country);
+    g.append("text").attr("y", flowerRadius + 11).attr("text-anchor", "middle")
+        .attr("font-size", "7.5px").attr("font-family", "var(--font-ui)")
+        .attr("fill", "var(--text-color)").attr("opacity", 0.65)
+        .text(c.country.length > 14 ? c.country.slice(0, 13) + "…" : c.country);
 
     // Interactions
-    g.on("mouseenter", function(event) {
+    g.on("mouseenter", function (event) {
         showTooltip(event, c);
         d3.select(this).raise().transition().duration(180)
-            .attr("transform",`translate(${x},${y}) scale(1.35)`);
+            .attr("transform", `translate(${x},${y}) scale(1.35)`);
     })
-    .on("mousemove", moveTooltip)
-    .on("mouseleave", function() {
-        hideTooltip();
-        d3.select(this).transition().duration(180)
-            .attr("transform",`translate(${x},${y}) scale(1)`);
-    })
-    .on("click", function(event) {
-        event.stopPropagation();
-        showTooltip(event, c);
-    });
+        .on("mousemove", moveTooltip)
+        .on("mouseleave", function () {
+            hideTooltip();
+            d3.select(this).transition().duration(180)
+                .attr("transform", `translate(${x},${y}) scale(1)`);
+        })
+        .on("click", function (event) {
+            event.stopPropagation();
+            showTooltip(event, c);
+        });
 }
 
 // ========================================================
@@ -639,10 +639,10 @@ function showTooltip(event, c) {
         html += `<div class="tooltip-row">
             <span class="dot" style="background:${f.color}"></span>
             <span class="label">${f.label}</span>
-            <span class="value">${val!=null?val.toFixed(3):"N/A"}</span>
+            <span class="value">${formatFactorValue(f.key, val)}</span>
         </div>`;
     });
-    html += `<div class="tooltip-happiness">🌻 Happiness: ${c.happiness!=null?c.happiness.toFixed(2):"N/A"}</div>`;
+    html += `<div class="tooltip-happiness">🌻 Happiness: ${c.happiness != null ? c.happiness.toFixed(2) : "N/A"}</div>`;
     html += `<div style="text-align:center;opacity:0.5;font-size:0.75em;margin-top:4px;">${c.region}</div>`;
     d3.select("#tooltip-body").html(html);
     d3.select("#tooltip").classed("hidden", false);
@@ -651,13 +651,24 @@ function showTooltip(event, c) {
 function moveTooltip(event) {
     const el = document.getElementById("tooltip");
     const pad = 16;
-    let x = event.clientX+pad, y = event.clientY+pad;
+    let x = event.clientX + pad, y = event.clientY + pad;
     const r = el.getBoundingClientRect();
-    if (x+r.width>window.innerWidth) x = event.clientX-r.width-pad;
-    if (y+r.height>window.innerHeight) y = event.clientY-r.height-pad;
-    el.style.left = x+"px"; el.style.top = y+"px";
+    if (x + r.width > window.innerWidth) x = event.clientX - r.width - pad;
+    if (y + r.height > window.innerHeight) y = event.clientY - r.height - pad;
+    el.style.left = x + "px"; el.style.top = y + "px";
 }
-function hideTooltip() { d3.select("#tooltip").classed("hidden",true); }
+function hideTooltip() { d3.select("#tooltip").classed("hidden", true); }
+
+function formatFactorValue(factorKey, value) {
+    if (value == null) return "N/A";
+    if (factorKey === "Log GDP per capita") {
+        return `${value.toFixed(1)} (${(value / 12).toFixed(1)} of 12-scale)`;
+    }
+    if (factorKey === "Healthy life expectancy at birth") {
+        return `${value.toFixed(1)} years (${(value / 80).toFixed(1)} of 80-year scale)`;
+    }
+    return value.toFixed(3);
+}
 
 // ========================================================
 // REGION DETAIL — Stacked Area Chart (countries × factors)
@@ -773,16 +784,16 @@ function showRegionDetail(region, countries) {
 }
 
 function highlightRegion(region) {
-    d3.selectAll(".branch-group").each(function() {
+    d3.selectAll(".branch-group").each(function () {
         const r = d3.select(this).attr("data-region");
         d3.select(this).selectAll(".branch-path")
-            .attr("opacity", r===region?1:0.3)
-            .attr("stroke", r===region?(REGION_COLORS[r]||"#5D4037"):"#5D4037");
+            .attr("opacity", r === region ? 1 : 0.3)
+            .attr("stroke", r === region ? (REGION_COLORS[r] || "#5D4037") : "#5D4037");
     });
 }
 function clearRegionHighlight() {
     d3.selectAll(".branch-group").selectAll(".branch-path")
-        .attr("opacity",0.88).attr("stroke","#5D4037");
+        .attr("opacity", 0.88).attr("stroke", "#5D4037");
     selectedRegion = null;
 }
 
@@ -795,10 +806,10 @@ function initLeaves() {
     leaves = [];
     for (let i = 0; i < 22; i++) {
         leaves.push({
-            x:Math.random()*cv.width, y:Math.random()*cv.height,
-            size:4+Math.random()*7, speedY:0.25+Math.random()*0.6,
-            speedX:(Math.random()-0.5)*0.4, rotation:Math.random()*360,
-            rotSpeed:(Math.random()-0.5)*1.8, opacity:0.25+Math.random()*0.35
+            x: Math.random() * cv.width, y: Math.random() * cv.height,
+            size: 4 + Math.random() * 7, speedY: 0.25 + Math.random() * 0.6,
+            speedX: (Math.random() - 0.5) * 0.4, rotation: Math.random() * 360,
+            rotSpeed: (Math.random() - 0.5) * 1.8, opacity: 0.25 + Math.random() * 0.35
         });
     }
     animateLeaves();
@@ -807,26 +818,26 @@ function animateLeaves() {
     const cv = document.getElementById("leaves-canvas");
     const ctx = cv.getContext("2d");
     const sc = {
-        spring:["#FFB7C5","#FF9DB5","#FFC1CC"],
-        summer:["#FFD54F","#FFF176","#FFE082"],
-        autumn:["#FF6D00","#FF8F00","#D84315","#E65100"],
-        winter:["#E0E0E0","#B0BEC5","#CFD8DC","#FFF"]
+        spring: ["#FFB7C5", "#FF9DB5", "#FFC1CC"],
+        summer: ["#FFD54F", "#FFF176", "#FFE082"],
+        autumn: ["#FF6D00", "#FF8F00", "#D84315", "#E65100"],
+        winter: ["#E0E0E0", "#B0BEC5", "#CFD8DC", "#FFF"]
     };
-    (function frame(){
-        cv.width=window.innerWidth; cv.height=window.innerHeight;
-        ctx.clearRect(0,0,cv.width,cv.height);
-        const cols = sc[currentSeason]||sc.spring;
-        leaves.forEach(l=>{
-            ctx.save(); ctx.translate(l.x,l.y);
-            ctx.rotate(l.rotation*Math.PI/180);
-            ctx.globalAlpha=l.opacity;
-            ctx.fillStyle=cols[Math.abs(Math.floor(l.x*7+l.y*3))%cols.length];
-            if(currentSeason==="winter"){ctx.beginPath();ctx.arc(0,0,l.size*0.45,0,Math.PI*2);ctx.fill();}
-            else{ctx.beginPath();ctx.ellipse(0,0,l.size,l.size*0.42,0,0,Math.PI*2);ctx.fill();}
+    (function frame() {
+        cv.width = window.innerWidth; cv.height = window.innerHeight;
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        const cols = sc[currentSeason] || sc.spring;
+        leaves.forEach(l => {
+            ctx.save(); ctx.translate(l.x, l.y);
+            ctx.rotate(l.rotation * Math.PI / 180);
+            ctx.globalAlpha = l.opacity;
+            ctx.fillStyle = cols[Math.abs(Math.floor(l.x * 7 + l.y * 3)) % cols.length];
+            if (currentSeason === "winter") { ctx.beginPath(); ctx.arc(0, 0, l.size * 0.45, 0, Math.PI * 2); ctx.fill(); }
+            else { ctx.beginPath(); ctx.ellipse(0, 0, l.size, l.size * 0.42, 0, 0, Math.PI * 2); ctx.fill(); }
             ctx.restore();
-            l.y+=l.speedY; l.x+=l.speedX+Math.sin(l.y*0.008)*0.25; l.rotation+=l.rotSpeed;
-            if(l.y>cv.height+20){l.y=-15;l.x=Math.random()*cv.width;}
-            if(l.x>cv.width+20)l.x=-15; if(l.x<-20)l.x=cv.width+15;
+            l.y += l.speedY; l.x += l.speedX + Math.sin(l.y * 0.008) * 0.25; l.rotation += l.rotSpeed;
+            if (l.y > cv.height + 20) { l.y = -15; l.x = Math.random() * cv.width; }
+            if (l.x > cv.width + 20) l.x = -15; if (l.x < -20) l.x = cv.width + 15;
         });
         requestAnimationFrame(frame);
     })();
@@ -837,7 +848,7 @@ function animateLeaves() {
 // ========================================================
 function setupEventListeners() {
     document.querySelectorAll(".factor-btn").forEach(btn => {
-        btn.addEventListener("click", function() {
+        btn.addEventListener("click", function () {
             const factor = this.dataset.factor;
             if (selectedFactors.has(factor)) {
                 selectedFactors.delete(factor);
@@ -851,7 +862,7 @@ function setupEventListeners() {
     });
 
     const slider = document.getElementById("year-slider");
-    slider.addEventListener("input", function() {
+    slider.addEventListener("input", function () {
         currentYear = +this.value;
         document.getElementById("year-display").textContent = currentYear;
         isAllYears = false;
@@ -859,49 +870,49 @@ function setupEventListeners() {
         drawTree();
     });
 
-    document.getElementById("all-years-btn").addEventListener("click", function() {
+    document.getElementById("all-years-btn").addEventListener("click", function () {
         isAllYears = !isAllYears;
         this.classList.toggle("active", isAllYears);
-        document.getElementById("year-display").textContent = isAllYears?"All Years":currentYear;
+        document.getElementById("year-display").textContent = isAllYears ? "All Years" : currentYear;
         drawTree();
     });
 
-    document.getElementById("play-btn").addEventListener("click", function() {
+    document.getElementById("play-btn").addEventListener("click", function () {
         if (isPlaying) {
-            clearInterval(playInterval); isPlaying=false; this.textContent="▶ Play"; return;
+            clearInterval(playInterval); isPlaying = false; this.textContent = "▶ Play"; return;
         }
-        isPlaying=true; isAllYears=false;
+        isPlaying = true; isAllYears = false;
         document.getElementById("all-years-btn").classList.remove("active");
-        this.textContent="⏸ Pause";
-        currentYear=2005; slider.value=currentYear;
-        document.getElementById("year-display").textContent=currentYear;
-        playInterval = setInterval(()=>{
-            currentYear++; if(currentYear>2023) currentYear=2005;
-            slider.value=currentYear;
-            document.getElementById("year-display").textContent=currentYear;
+        this.textContent = "⏸ Pause";
+        currentYear = 2005; slider.value = currentYear;
+        document.getElementById("year-display").textContent = currentYear;
+        playInterval = setInterval(() => {
+            currentYear++; if (currentYear > 2023) currentYear = 2005;
+            slider.value = currentYear;
+            document.getElementById("year-display").textContent = currentYear;
             drawTree();
         }, 1200);
     });
 
-    document.getElementById("close-region-detail").addEventListener("click", function() {
-        d3.select("#region-detail").classed("hidden",true);
+    document.getElementById("close-region-detail").addEventListener("click", function () {
+        d3.select("#region-detail").classed("hidden", true);
         clearRegionHighlight(); drawTree();
     });
 
     document.querySelectorAll(".season-btn").forEach(btn => {
-        btn.addEventListener("click", function() {
-            document.querySelectorAll(".season-btn").forEach(b=>b.classList.remove("active"));
+        btn.addEventListener("click", function () {
+            document.querySelectorAll(".season-btn").forEach(b => b.classList.remove("active"));
             this.classList.add("active");
             currentSeason = this.dataset.season;
-            document.body.className = currentSeason==="spring"?"":currentSeason;
+            document.body.className = currentSeason === "spring" ? "" : currentSeason;
         });
     });
 
-    d3.select("#tree-svg").on("click", function() {
+    d3.select("#tree-svg").on("click", function () {
         clearRegionHighlight();
-        d3.select("#region-detail").classed("hidden",true);
+        d3.select("#region-detail").classed("hidden", true);
     });
 
     let resizeTimer;
-    window.addEventListener("resize",()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(drawTree,150);});
+    window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(drawTree, 150); });
 }

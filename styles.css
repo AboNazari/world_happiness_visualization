@@ -166,6 +166,11 @@ body {
     text-shadow: 0 2px 20px rgba(0,0,0,0.06);
 }
 
+.parent-subtitle {
+    margin: auto;
+    width: fit-content;
+}
+
 .subtitle {
     font-family: var(--font-body);
     font-size: clamp(0.95rem, 1.8vw, 1.15rem);
@@ -174,6 +179,7 @@ body {
     max-width: 780px;
     margin: 0 auto;
     line-height: 1.7;
+    text-align: left;
 }
 
 /* ---- Intro ---- */
